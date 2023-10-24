@@ -1,0 +1,9 @@
+*.png
+*.pdf
+*.pkl
+*.zip
+*.swp
+sl.sh
+.ipynb_checkpoints/
+__pycache__/
+.vscode/
