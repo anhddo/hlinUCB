@@ -8,7 +8,6 @@ import math
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import numpy.linalg as LA
-import pdb
 import pickle
 from sklearn.preprocessing import normalize
 
@@ -37,7 +36,7 @@ def sqrt_beta_dissimilarity(lambda_, m2, delta, d, M, n, L, gamma, epsilon):
 
 def sqrt_beta_corruption(delta, d, M, t, epsilon, alpha):
     return 1 + math.sqrt(d * math.log(1+M*t/d) + math.log(1/delta)) + alpha * epsilon * M * t
-    # return 1 + math.sqrt(d * math.log(M*t/d/delta))
+
 
 
 def oful(theta, action_set_size, T):
@@ -57,9 +56,7 @@ def oful(theta, action_set_size, T):
         theta_hat = inv_cov @ b
         sqrt_beta_ = sqrt_beta(lambda_, m2, delta, d, t, L)
         # ||x||_V^-1
-        weighted_norm = np.sqrt(
-            np.diag(action_set @ inv_cov @ action_set.T))
-        # weighted_norm = np.array([np.sqrt(a @ inv_cov @ a.T) for a in action_set])
+        weighted_norm = np.sqrt(np.diag(action_set @ inv_cov @ action_set.T))
         # <\hat{\theta}, x> + ||x||_V^-1 * sqrt(Beta)
         ucb = action_set @ theta_hat + sqrt_beta_ * weighted_norm
         select_arm = action_set[np.argmax(ucb)]
@@ -74,7 +71,6 @@ def oful(theta, action_set_size, T):
 
 def independence_run(theta_list, action_set_size, T):
     regret = []
-    # for m in tqdm(range(len(theta_list)), desc='independent learners'):
     for m in range(len(theta_list)):
         regret.append(oful(theta_list[m], action_set_size, T))
     return regret
@@ -112,7 +108,6 @@ def dis_lin_ucb(theta_list, action_set_size, T):
             theta_hat = inv_cov @ b_m
             sqrt_beta_ = sqrt_beta(lambda_, 1, delta, d, t, 1)
             weighted_norm = np.sqrt(np.diag(action_set @ inv_cov @ action_set.T))
-            # weighted_norm = np.array([np.sqrt(a @ inv_cov @ a.T) for a in action_set])
             ucb = action_set @ theta_hat + sqrt_beta_ * weighted_norm
             select_arm_ind = np.argmax(ucb)
             select_arm = action_set[select_arm_ind]
@@ -141,7 +136,6 @@ def hlin_ucb(theta_list, action_set_size, T):
     regret = []
 
     epsilon += 1e-7  # to avoid division by zero
-    # epsilon/=4
     action_set = [None for _ in range(M)]
     cov = [0 for _ in range(M)]
     b = [np.zeros(d) for _ in range(M)]
@@ -179,7 +173,6 @@ def hlin_ucb(theta_list, action_set_size, T):
             else:
                 sqrt_beta_d = sqrt_beta(lambda_, 1, delta_2, d, t, 1)
             weighted_norm = np.sqrt(np.diag(action_set @ inv_cov @ action_set.T))
-            # weighted_norm = np.array([np.sqrt(a @ inv_cov @ a.T) for a in action_set])
             ucb = action_set @ theta_hat + sqrt_beta_d * weighted_norm
             select_arm_ind = np.argmax(ucb)
             select_arm = action_set[select_arm_ind]
@@ -197,9 +190,6 @@ def hlin_ucb(theta_list, action_set_size, T):
             cov[m] += w * np.outer(select_arm, select_arm)
             b[m] += w * reward * select_arm
 
-            # if t < tau:
-            #     cov_i[m] += np.outer(select_arm, select_arm)
-            #     b_i[m] += reward * select_arm
 
             best_action = action_set[np.argmax(action_set @ theta_list[m])]
             regret_t += np.dot(theta_list[m], best_action - select_arm)
@@ -292,5 +282,4 @@ def exp_in_range(a, b, n_exp, M, d, T, ds, folder_name, runs=1, max_base=1):
         for base_scale in np.linspace(0, max_base, num=5):
             parameter.append(
                 [M, d, T, ds, epsilon, base_scale, folder_name, runs])
-            # create_simulation(M, d, T, ds, epsilon, base_scale, folder_name)
     return parameter

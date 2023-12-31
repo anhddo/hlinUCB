@@ -9,7 +9,6 @@ import glob
 import argparse
 from os.path import basename, join
 
-
 def confidence_plot(ax, algo, style, label, plot_data):
     regret_mean = plot_data['mean']
     regret_std = plot_data['std']
